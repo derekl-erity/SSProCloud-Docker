@@ -8,6 +8,7 @@
 //  conditions of the accompanying license agreement.
 // --------------------------------------------------------
 $comment = 'Update the following settings to the details of your Pro Cloud Server';
+// Production note: if this endpoint is exposed beyond localhost/internal networks, use HTTPS and set $sEnforceCerts = 'true'.
 	$sProtocol = 'http';
 	$sServerName = 'ssprocloudserver';
 	$sPort = '1804';

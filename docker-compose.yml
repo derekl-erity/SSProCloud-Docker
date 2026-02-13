@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   ssprocloudserver:
     image: scottyhardy/docker-wine:stable-7.0
@@ -7,7 +5,13 @@ services:
     entrypoint: /usr/bin/ssprocloud-entrypoint
     ports:
       - "127.0.0.1:3389:3389/tcp" # RDP (internal, through SSH tunnel only)
-      - "1805:1805/tcp" # Pro Cloud Floating License (SSL)
+      - "${PCS_BIND_IP:-127.0.0.1}:1805:1805/tcp" # Pro Cloud Floating License (SSL)
+    healthcheck:
+      test: ["CMD-SHELL", "bash -lc ': >/dev/tcp/127.0.0.1/1805'"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
     networks:
       ssprocloud:
         ipv4_address: ${BASE_IP}.2
@@ -25,7 +29,13 @@ services:
     build: webconfig
     restart: always
     ports:
-      - "1800:80/tcp"
+      - "${WEB_BIND_IP:-127.0.0.1}:1800:80/tcp"
+    healthcheck:
+      test: ["CMD-SHELL", "php -r \"exit(@file_get_contents('http://127.0.0.1/') === false ? 1 : 0);\""]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     networks:
       ssprocloud:
         ipv4_address: ${BASE_IP}.3
